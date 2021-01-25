@@ -1,39 +1,46 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import util from "../util";
-import { addToCart } from "../actions/cartActions";
-import { fetchProducts } from "../actions/productActions";
-class Products extends Component {
-    componentDidMount() {
-        this.props.fetchProducts();
-    }
-    render() {
-        const { cartItems } = this.props;
-        const productItems = this.props.products.map((product) => (
-            <div className="col-md-4 my-5" key={product.id}>
-                <div className="thumbnail text-center">
-                    <a
-                        href={`#${product.id}`}
-                        onClick={(e) => this.props.addToCart(this.props.cartItems, product)}
-                    >
-                        <img src={`products/${product.sku}_2.jpg`} alt={product.title} />
-                        <p>{product.title}</p>
-                    </a>
-                    <b>{util.formatCurrency(product.price)}</b>
-                    <button
-                        className="btn btn-primary"
-                        onClick={(e) => this.props.addToCart(cartItems, product)}
-                    >
-                        Add to cart
-                    </button>
-                </div>
-            </div>
-        ));
-        return <div className="row">{productItems}</div>;
-    }
+import React from 'react'
+import {ListGroup, ListGroupItem, Button} from 'react-bootstrap';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {faTrash, faMinus, faPlus} from "@fortawesome/free-solid-svg-icons";
+
+class Products extends React.Component
+{
+  constructor(props) {
+    super(props);
+  }
+
+
+  render()
+  {
+    return <ListGroup className='products-list'>
+      {  this.props.products && this.props.products.map( product =>{
+    return (
+            <ListGroupItem>
+
+              <span>  {product.name} : </span>
+               <span>&nbsp;&nbsp;&nbsp; {product.price} $ X </span>
+
+
+              <Button  variant="outline-primary" disabled={!product.quantity} className="btn-product-list" onClick={() => this.props.decrease(product.id)} >
+                  <FontAwesomeIcon icon={faMinus}/>
+                </Button>
+
+              {product.quantity ? product.quantity : 0 }
+              <Button className="btn-product-list" onClick={() => this.props.increase(product.id)} >
+                <FontAwesomeIcon icon={faPlus}/>
+              </Button>
+
+              = { product.price * product.quantity} $ &nbsp;
+              <button className="btn-product-list" onClick={() => this.props.delete(product.id)}  >
+              <FontAwesomeIcon icon={faTrash}/>
+            </button>
+            </ListGroupItem>
+        )
+
+    })
+      }
+    </ListGroup>
+  }
 }
-const mapStateToProps = (state) => ({
-    products: state.products.filteredItems,
-    cartItems: state.cart.items,
-});
-export default connect(mapStateToProps, { fetchProducts, addToCart })(Products);
+export default Products;
+
